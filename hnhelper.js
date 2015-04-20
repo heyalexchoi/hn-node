@@ -122,15 +122,15 @@ gets the story item for each id, and asynchronously
 returns an array of story items
 */
 HNHelper.prototype.getStories = function(type, callback) {
-	var stories = storiesCollection.findOne({type: type}, {}, function(error, result) {
-        if (error && callback) {
-            callback(result, error);
-            return;
-        } else if (!result && callback) {
-        	var findError = new Error("Couldn't find stories group: " + type);
-        	callback(result, findError);
-        	return;
-        }
+	storiesCollection.findOne({type: type}, {}, function(error, result) {
+		if (error && callback) {
+			callback(result, error);
+			return;
+		} else if (!result && callback) {
+			var findError = new Error("Couldn't find stories group: " + type);
+			callback(result, findError);
+			return;
+		}
 		var storyIDs = result.stories;
 		var stories = [];
 		var count = 0;
@@ -141,6 +141,64 @@ HNHelper.prototype.getStories = function(type, callback) {
 				if (count == storyIDs.length) { callback(stories, error); }
 			});
 		});
+	});
+};
+
+/* 
+Asynchronously retrieves item with id 
+*/
+HNHelper.prototype.getItem = function(id, callback) {
+	itemsCollection.findOne({_id: id}, {}, function(error, result) {
+		if (!result && callback) {
+			var findError = new Error("Couldn't find item with id: " + id);
+			callback(result, findError);
+		} else if (callback) {
+			callback(result, error);
+		}
+	});
+};
+
+/* 
+get item and populate child property with array of item objects
+*/
+HNHelper.prototype.getItemWithChildren = function(id, callback) {
+	var self = this;
+	self.getItem(id, function(item, error) {
+		if (item.kids) {
+			var count = 0;
+			item.children = [];
+			item.kids.map(function(kidID) {
+				self.getItem(kidID, function(child, error) {
+					count ++;
+					if (child) { item.children.push(child); }
+					if (count == item.kids.length) { callback(item, error); }
+				});
+			});
+		} else {
+			callback(item, error);
+		}
+	});
+};
+
+
+/* 
+Recursively get item and all its descendants
+callback needs to not fire until all children are in their parents
+*/
+HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
+	var self = this;
+	self.getItemWithChildren(id, function(item, error) {
+		if (item.children) {
+			var count = 0;
+			item.children.map(function(child) {
+				self.getItemWithAllDescendants(child._id, function(child, error) { // calling function again with child
+					count ++;
+					if (count == item.kids.length) { callback(item, error); }
+				});
+			});
+		} else {
+			callback(item, error);
+		}
 	});
 };
 

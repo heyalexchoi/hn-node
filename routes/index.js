@@ -8,10 +8,14 @@ router.get('/', function(req, res, next) {
 });
 
 // TO DO: add page limit offset to req, query, and result
-router.get('/stories/:id', function(req, res, next) {
-
-    res.send('fuckin stories yo'); return;
-
+router.get('/items/:id', function(req, res, next) {
+    var id = req.params.id;
+    helper.getItemWithAllDescendants(id, function(item, error) {
+        console.log(item);
+        console.error(error);
+        if (item) res.json(item);
+        if (error) next(error);
+    });
 });
 
 // TO DO: add page limit offset to req, query, and result
