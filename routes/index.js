@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Fucking BANANAS' });
+  res.render('index', { title: 'GO AWAY plz1' });
 });
 
 /* GET Userlist page. */
@@ -15,6 +15,22 @@ router.get('/userlist', function(req, res) {
             "userlist" : docs
         });
     });
+});
+// TO DO: add page limit offset to req, query, and result
+router.get('/topstories', function(req, res) {
+	var collection = req.db.get('stories');
+	var stories = collection.findOne({type: 'topstories'}, {}, function(error, result) {
+		var storyIDs = result.stories;
+		var stories = [];
+		var count = 0;
+		storyIDs.map(function(id) {
+			req.db.get('items').find({_id: id}, function(error, result) {
+				count ++;
+				if (result) {stories.push(result);}
+				if (count == storyIDs.length) { res.json(stories); }
+			});
+		});
+	});
 });
 
 /* GET New User page. */
