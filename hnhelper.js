@@ -116,4 +116,32 @@ HNHelper.prototype.syncEverything = function(callback) {
 	});
 };
 
+/* 
+Pulls out stories array for type (ie 'topstories'), 
+gets the story item for each id, and asynchronously
+returns an array of story items
+*/
+HNHelper.prototype.getStories = function(type, callback) {
+	var stories = storiesCollection.findOne({type: type}, {}, function(error, result) {
+        if (error && callback) {
+            callback(result, error);
+            return;
+        } else if (!result && callback) {
+        	var findError = new Error("Couldn't find stories group: " + type);
+        	callback(result, findError);
+        	return;
+        }
+		var storyIDs = result.stories;
+		var stories = [];
+		var count = 0;
+		storyIDs.map(function(id) {
+			itemsCollection.find({_id: id}, function(error, result) {
+				count ++;
+				if (result) {stories.push(result);}
+				if (count == storyIDs.length) { callback(stories, error); }
+			});
+		});
+	});
+};
+
 module.exports = new HNHelper(ref);
