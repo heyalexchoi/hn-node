@@ -75,7 +75,8 @@ kids (children) are represented by IDs
 HNHelper.prototype.syncItem = function(id, callback) {
 	this.trackItem(id, function(item, error) {
 		if (item) {
-			itemsCollection.update({'id': id}, item, {upsert: true}, function(err, doc) {
+			item._id = id;
+			itemsCollection.update({_id: id}, item, {upsert: true}, function(err, doc) {
 				if (callback) callback(item, err);
 			});	
 		} else {
@@ -114,7 +115,5 @@ HNHelper.prototype.syncEverything = function(callback) {
 		});
 	});
 };
-
-
 
 module.exports = new HNHelper(ref);
