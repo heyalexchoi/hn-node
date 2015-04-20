@@ -17,9 +17,16 @@ router.get('/userlist', function(req, res) {
     });
 });
 // TO DO: add page limit offset to req, query, and result
-router.get('/topstories', function(req, res) {
+router.get('/:type(*stories)', function(req, res, next) {
 	var collection = req.db.get('stories');
-	var stories = collection.findOne({type: 'topstories'}, {}, function(error, result) {
+	var stories = collection.findOne({type: req.params.type}, {}, function(error, result) {
+        if (error) {
+            next(error); 
+            return;
+        } else if (!result) {
+            res.sendStatus(404);
+            return;
+        }
 		var storyIDs = result.stories;
 		var stories = [];
 		var count = 0;
