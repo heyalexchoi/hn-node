@@ -4,7 +4,7 @@ var helper = require('../hnhelper');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'GO AWAY plz1' });
+  res.render('index', { title: 'woof woof' });
 });
 
 // TO DO: add page limit offset to req, query, and result
