@@ -9,10 +9,8 @@ router.get('/', function(req, res, next) {
 
 // TO DO: add page limit offset to req, query, and result
 router.get('/items/:id', function(req, res, next) {
-    var id = req.params.id;
-    helper.getItemWithAllDescendants(id, function(item, error) {
-        console.log(item);
-        console.error(error);
+    var id = Number(req.params.id);
+    helper.getItemWithChildren(id, function(item, error) {        
         if (item) res.json(item);
         if (error) next(error);
     });

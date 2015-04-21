@@ -8,6 +8,8 @@ var ref = new Firebase("https://hacker-news.firebaseio.com");
 var storiesCollection = db.get('stories');
 var itemsCollection = db.get('items');
 
+itemsCollection.id = function (str) { return str; };
+
 /* 
 Use HNHelper to get all the data from HN's firebase API, 
 throw it into mongodb, and keep it up to date 
@@ -16,6 +18,7 @@ function HNHelper(ref) {
 	this.ref = ref;
 	this.keysWatched = {};
 }
+
 /* 
 If not already watching a piece of data - 
 ie: a story group, or an item - 
@@ -164,7 +167,7 @@ get item and populate child property with array of item objects
 HNHelper.prototype.getItemWithChildren = function(id, callback) {
 	var self = this;
 	self.getItem(id, function(item, error) {
-		if (item.kids) {
+		if (item && item.kids) {
 			var count = 0;
 			item.children = [];
 			item.kids.map(function(kidID) {
@@ -188,7 +191,7 @@ callback needs to not fire until all children are in their parents
 HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
 	var self = this;
 	self.getItemWithChildren(id, function(item, error) {
-		if (item.children) {
+		if (item && item.children) {
 			var count = 0;
 			item.children.map(function(child) {
 				self.getItemWithAllDescendants(child._id, function(child, error) { // calling function again with child
