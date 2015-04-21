@@ -75,6 +75,7 @@ and updates with hn firebase api
 can be found in collection db.items
 kids (children) are represented by IDs
 */
+// TO DO: this method should sync any new children / descendants
 HNHelper.prototype.syncItem = function(id, callback) {
 	this.trackItem(id, function(item, error) {
 		if (item) {
@@ -183,26 +184,53 @@ HNHelper.prototype.getItemWithChildren = function(id, callback) {
 	});
 };
 
-
 /* 
 Recursively get item and all its descendants
 callback needs to not fire until all children are in their parents
 */
+
+
 HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
+	
 	var self = this;
-	self.getItemWithChildren(id, function(item, error) {
-		if (item && item.children) {
-			var count = 0;
-			item.children.map(function(child) {
-				self.getItemWithAllDescendants(child._id, function(child, error) { // calling function again with child
-					count ++;
-					if (count == item.kids.length) { callback(item, error); }
+	var count = 0;
+	var originalItem;
+
+// call back should return item 
+// until no children and no count
+	var getItemAndDescendants = function(id, callback) {
+		count ++;
+		self.getItem(id, function(item, error) {
+			if (!originalItem && item) { originalItem = item; } 
+			count --;
+			if (item && item.kids) {
+				item.kids.map(function(kidID) {
+					getItemAndDescendants(kidID, function(child, error) { // when do i callback child
+						if (!item.children) { item.children = []; }
+						item.children.push(child);
+						if (count === 0) {
+							console.log('callback original item' + originalItem._id);
+							callback(originalItem, error);
+						} else {
+							console.log('callback item' + item._id);
+							callback(item, error);
+						}
+					});
 				});
-			});
-		} else {
-			callback(item, error);
-		}
-	});
+			} else {
+				if (count === 0) {
+					console.log('no kids callback original item' + originalItem._id);
+					callback(originalItem, error);	
+				} else {
+					console.log('no kids callback item' + item._id);
+					callback(item, error);
+				}	
+			}
+		});
+	};
+	
+	getItemAndDescendants(id, callback);
+
 };
 
 module.exports = new HNHelper(ref);
