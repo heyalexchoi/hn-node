@@ -196,40 +196,31 @@ HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
 	var count = 0;
 	var originalItem;
 
-// call back should return item 
-// until no children and no count
 	var getItemAndDescendants = function(id, callback) {
 		count ++;
 		self.getItem(id, function(item, error) {
-			if (!originalItem && item) { originalItem = item; } 
 			count --;
+			if (!originalItem && item) { originalItem = item; } 
 			if (item && item.kids) {
 				item.kids.map(function(kidID) {
-					getItemAndDescendants(kidID, function(child, error) { // when do i callback child
+					getItemAndDescendants(kidID, function(child, error) { 
 						if (!item.children) { item.children = []; }
 						item.children.push(child);
-						if (count === 0) {
-							console.log('callback original item' + originalItem._id);
-							callback(originalItem, error);
-						} else {
-							console.log('callback item' + item._id);
-							callback(item, error);
-						}
+						callback(item, error);
 					});
 				});
 			} else {
-				if (count === 0) {
-					console.log('no kids callback original item' + originalItem._id);
-					callback(originalItem, error);	
-				} else {
-					console.log('no kids callback item' + item._id);
-					callback(item, error);
-				}	
-			}
+				callback(item, error);
+			} 
 		});
+
 	};
 	
-	getItemAndDescendants(id, callback);
+	getItemAndDescendants(id, function(result, error) {
+		if (count===0) {
+			callback(originalItem, error);
+		}
+	});
 
 };
 
