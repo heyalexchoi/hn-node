@@ -73,7 +73,7 @@ app.use(function(err, req, res, next) {
  * get that shit
  */
 
-hnhelper.syncEverything();
+helper.syncEverything();
 
 
 module.exports = app;
