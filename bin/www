@@ -7,7 +7,6 @@
 var app = require('../app');
 var debug = require('debug')('HN-Node:server');
 var http = require('http');
-var hnhelper = require('../hnhelper');
 
 /**
  * Get port from environment and store in Express.
@@ -89,11 +88,5 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
-
-/**
- * get that shit
- */
-
-hnhelper.syncEverything();
 
 

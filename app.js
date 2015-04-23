@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var helper = require('./hnhelper');
 var monk = require('monk');
 var config = require('config');
 var dbConfig = config.get('hnhelper.dbConfig');
@@ -67,6 +67,13 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+
+/**
+ * get that shit
+ */
+
+hnhelper.syncEverything();
 
 
 module.exports = app;
