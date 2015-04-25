@@ -139,10 +139,10 @@ HNHelper.prototype.getStories = function(type, callback) {
 		var stories = [];
 		var count = 0;
 		storyIDs.map(function(id) {
-			itemsCollection.find({_id: id}, function(error, result) {
+			itemsCollection.findOne({_id: id}, function(error, result) {
 				count ++;
 				if (result) {stories.push(result);}
-				if (count == storyIDs.length) { callback(stories, error); }
+				if (count == storyIDs.length && callback) {callback(stories, error);}
 			});
 		});
 	});
