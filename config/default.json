@@ -1,10 +1,5 @@
 {
-  "hnhelper": {
-    "dbConfig": {
-      "host": "localhost",
-      "port": 27017,
-      "dbName": "hn",
-      "url": "localhost:27017/hn"
-      }
-    }
-  }
+	"mongodb": {
+		"url": "mongodb://localhost:27017/hn"
+	}
+}

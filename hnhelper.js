@@ -1,8 +1,8 @@
 var Firebase = require("firebase");
 var monk = require('monk');
 var config = require('config');
-var dbConfig = config.get('hnhelper.dbConfig');
-var db = monk(dbConfig.url);
+var dbURL = process.env.MONGODB_URL || config.mongodb.url;
+var db = monk(dbURL);
 
 var ref = new Firebase("https://hacker-news.firebaseio.com");
 var storiesCollection = db.get('stories');
