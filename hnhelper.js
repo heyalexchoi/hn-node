@@ -207,10 +207,15 @@ HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
 			count --;
 			if (!originalItem && item) { originalItem = item; } 
 			if (item && item.kids) {
-				item.kids.map(function(kidID) {
+				var childCount = 0;
+				item.kids.map(function(kidID, index) {
 					getItemAndDescendants(kidID, function(child, error) { 
+						childCount ++;
 						if (!item.children) { item.children = []; }
-						item.children.push(child);
+						item.children[index] = child;
+						if (childCount == item.kids.length) {
+							item.children = item.children.filter(function(e) { return e; }); // compact
+						}
 						callback(item, error);
 					});
 				});
@@ -218,9 +223,10 @@ HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
 				callback(item, error);
 			} 
 		});
-
 	};
 	
+
+
 	getItemAndDescendants(id, function(result, error) {
 		if (count===0) {
 			callback(originalItem, error);
