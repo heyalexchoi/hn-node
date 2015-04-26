@@ -125,7 +125,8 @@ Pulls out stories array for type (ie 'topstories'),
 gets the story item for each id, and asynchronously
 returns an array of story items
 */
-HNHelper.prototype.getStories = function(type, callback) {
+HNHelper.prototype.getStories = function(type, offset, limit, callback) {
+	var self = this;
 	storiesCollection.findOne({type: type}, {}, function(error, result) {
 		if (error && callback) {
 			callback(result, error);
@@ -134,17 +135,21 @@ HNHelper.prototype.getStories = function(type, callback) {
 			var findError = new Error("Couldn't find stories group: " + type);
 			callback(result, findError);
 			return;
-		}
-		var storyIDs = result.stories;
-		var stories = [];
-		var count = 0;
-		storyIDs.map(function(id) {
-			itemsCollection.findOne({_id: id}, function(error, result) {
-				count ++;
-				if (result) {stories.push(result);}
-				if (count == storyIDs.length && callback) {callback(stories, error);}
+		} else if (callback) {
+			var storyIDs = result.stories.slice(Number(offset), Number(offset) + Number(limit));
+			var stories = [];
+			var count = 0;
+			storyIDs.map(function(id, index) {
+				self.getItem(id, function(result, error) {
+					count ++;
+					if (result) { stories[index] = result; }
+					if (count == storyIDs.length) { 
+						stories = stories.filter(function(e) { return e; }); // compact
+						callback(stories, error); 
+					}
+				});
 			});
-		});
+		}
 	});
 };
 
