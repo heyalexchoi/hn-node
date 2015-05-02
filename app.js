@@ -18,7 +18,7 @@ app.use(favicon(__dirname + '/public/images/dog.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(compress())
+app.use(compress());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

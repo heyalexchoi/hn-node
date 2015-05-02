@@ -8,7 +8,23 @@ var ref = new Firebase("https://hacker-news.firebaseio.com");
 var storiesCollection = db.get('stories');
 var itemsCollection = db.get('items');
 
-itemsCollection.id = function (str) { return str; };
+var S = require('string');
+
+/* 
+	HN items come in with all kinds of html gunk in their text
+*/
+var cleanText = function(string) {
+    var decoded =  S(string).decodeHTMLEntities().s;
+    var stripped = S(decoded).stripTags().s;
+    return stripped;
+};
+
+/*
+ monk by default converts ids into the mongo object id format which 
+ is totally incompatible with the HN based ids i'm using.
+ the workaround is to override that behavior:
+*/
+itemsCollection.id = function (str) { return str; }; 
 
 /* 
 Use HNHelper to get all the data from HN's firebase API, 
@@ -80,6 +96,7 @@ HNHelper.prototype.syncItem = function(id, callback) {
 	this.trackItem(id, function(item, error) {
 		if (item) {
 			item._id = id;
+			if (item.text) item.text = cleanText(item.text);
 			itemsCollection.update({_id: id}, item, {upsert: true}, function(err, doc) {
 				if (callback) callback(item, err);
 			});	
