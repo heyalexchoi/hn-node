@@ -1,14 +1,11 @@
-var Firebase = require("firebase");
-var monk = require('monk');
-var config = require('config');
-var dbURL = process.env.MONGODB_URL || config.mongodb.url;
-var db = monk(dbURL);
+// TO DO: hnhelper can be broken down into an hn sync and a story builder
 
-var ref = new Firebase("https://hacker-news.firebaseio.com");
-var storiesCollection = db.get('stories');
-var itemsCollection = db.get('items');
-
-itemsCollection.id = function (str) { return str; };
+const Firebase = require("firebase");
+const ref = new Firebase("https://hacker-news.firebaseio.com");
+const DBConnection = require('./db_connection');
+const db = new DBConnection();
+const itemsCollection = db.items;
+const storiesCollection = db.stories;
 
 /* 
 Use HNHelper to get all the data from HN's firebase API, 
@@ -80,6 +77,7 @@ HNHelper.prototype.syncItem = function(id, callback) {
 	this.trackItem(id, function(item, error) {
 		if (item) {
 			item._id = id;
+			item.updated = Date();
 			itemsCollection.update({_id: id}, item, {upsert: true}, function(err, doc) {
 				if (callback) callback(item, err);
 			});	
