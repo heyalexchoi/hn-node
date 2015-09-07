@@ -2,6 +2,7 @@ var monk = require('monk');
 var config = require('config');
 var dbURL = process.env.MONGODB_URL || config.mongodb.url;
 var db = monk(dbURL);
+
 const storiesCollection = db.get('stories');
 const itemsCollection = db.get('items');
 
