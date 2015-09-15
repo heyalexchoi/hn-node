@@ -1,6 +1,7 @@
 // TO DO: hnhelper can be broken down into an hn sync and a story builder
 
 const Firebase = require("firebase");
+const _  = require("underscore");
 const ref = new Firebase("https://hacker-news.firebaseio.com");
 const DBConnection = require('./db_connection');
 const db = new DBConnection();
@@ -124,45 +125,39 @@ gets the story item for each id, and asynchronously
 returns an array of story items
 */
 HNHelper.prototype.getStories = function(type, offset, limit, callback) {
-	var self = this;
-	storiesCollection.findOne({type: type}, {}, function(error, result) {
-		if (error && callback) {
-			callback(result, error);
-			return;
-		} else if (!result && callback) {
-			var findError = new Error("Couldn't find stories group: " + type);
-			callback(result, findError);
-			return;
-		} else if (callback) {
-			var storyIDs = result.stories.slice(Number(offset), Number(offset) + Number(limit));
-			var stories = [];
-			var count = 0;
-			storyIDs.map(function(id, index) {
-				self.getItem(id, function(result, error) {
-					count ++;
-					if (result) { stories[index] = result; }
-					if (count == storyIDs.length) { 
-						stories = stories.filter(function(e) { return e; }); // compact
-						callback(stories, error); 
-					}
-				});
-			});
+	const self = this;
+	storiesCollection.findOne({type: type}, function(error, result) {
+		if (error) { callback(error, result); }
+		else if (!result) { callback( new Error("Couldn't find stories group: " + type), null);}
+		else {			
+			const storyIDs = result.stories.slice(Number(offset), Number(offset) + Number(limit));					
+			self.getItems(storyIDs, function(err, res) {				
+				const ordered = orderResults(storyIDs, res);
+				callback(null, ordered);
+			}); 
 		}
 	});
 };
+
+// sort results into order given in ids
+function orderResults(ids, items) {
+	const indexed = _.indexBy(items, '_id');
+	return ids.map(function(id) { return indexed[id]; });
+}
 
 /* 
 Asynchronously retrieves item with id 
 */
 HNHelper.prototype.getItem = function(id, callback) {
-	itemsCollection.findOne({_id: id}, {}, function(error, result) {
-		if (!result && callback) {
-			var findError = new Error("Couldn't find item with id: " + id);
-			callback(result, findError);
-		} else if (callback) {
-			callback(result, error);
-		}
-	});
+	return itemsCollection.findOne({_id: id}, callback);
+};
+
+HNHelper.prototype.getItems = function(ids, callback) {
+	return itemsCollection.find({_id: { $in: ids } }, callback);
+};
+
+HNHelper.prototype.getChildren = function(id, callback) {
+	return itemsCollection.find({parent: id}, callback);
 };
 
 /* 
@@ -170,28 +165,23 @@ get item and populate child property with array of item objects
 */
 HNHelper.prototype.getItemWithChildren = function(id, callback) {
 	var self = this;
-	self.getItem(id, function(item, error) {
-		if (item && item.kids) {
-			var count = 0;
-			item.children = [];
-			item.kids.map(function(kidID) {
-				self.getItem(kidID, function(child, error) {
-					count ++;
-					if (child) { item.children.push(child); }
-					if (count == item.kids.length) { callback(item, error); }
-				});
-			});
-		} else {
-			callback(item, error);
-		}
+	var item;
+	self.getItem(id)
+	.then(function(resItem) {
+		item = resItem;		
+		return self.getItems(item.kids);
+	})
+	.then(function(resChildren) {				
+		item.children = orderResults(item.kids, resChildren);
+		callback(null, item);
 	});
 };
+
 
 /* 
 Recursively get item and all its descendants
 callback needs to not fire until all children are in their parents
 */
-
 
 HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
 	
