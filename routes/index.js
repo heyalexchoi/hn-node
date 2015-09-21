@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var helper = require('../services/hnhelper');
+var HNHelper = require('../services/hn_helper');
+var helper = new HNHelper();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
