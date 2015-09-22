@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const Dbc = require('../services/db_cleaner');
+const dbc = new Dbc();
+
+const exit = function() {
+	process.exit();
+};
+
+dbc.clean(exit);
