@@ -5,8 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var compress = require('compression');
-var Syncer = require('./services/hn_syncer');
-var syncer = new Syncer();
 var routes = require('./routes/index');
 var app = express();
 
@@ -55,11 +53,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-
-/**
- * get that shit
- */
-syncer.syncEverything();
 
 module.exports = app;

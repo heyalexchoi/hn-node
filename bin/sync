@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+const Syncer = require('../services/hn_syncer');
+const syncer = new Syncer();
+syncer.syncEverything();
