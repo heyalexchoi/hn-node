@@ -63,7 +63,7 @@ HNHelper.prototype.getItemWithChildren = function(id, callback) {
 		item = resItem;		
 		return self.getItems(item.kids);
 	})
-	.then(function(resChildren) {				
+	.then(function(resChildren) {			
 		item.children = orderResults(item.kids, resChildren);
 		callback(null, item);
 	});

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+require('dotenv').load();
+require('newrelic');
 
 const Dbc = require('../services/db_cleaner');
 const dbc = new Dbc();
