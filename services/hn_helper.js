@@ -11,6 +11,8 @@ const storiesCollection = db.stories;
 
 function HNHelper() {}
 
+HNHelper.prototype.db = db;
+
 /* 
 Pulls out stories array for type (ie 'topstories'), 
 gets the story item for each id, and asynchronously
@@ -63,7 +65,7 @@ HNHelper.prototype.getItemWithChildren = function(id, callback) {
 		item = resItem;		
 		return self.getItems(item.kids);
 	})
-	.then(function(resChildren) {				
+	.then(function(resChildren) {			
 		item.children = orderResults(item.kids, resChildren);
 		callback(null, item);
 	});

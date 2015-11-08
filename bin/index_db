@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+
+require('dotenv').load();
+require('newrelic');
+
+const Helper = require('../services/hn_helper');
+const helper = new Helper();
+
+const db = helper.db;
+const items = db.items;
+
+var running = 0;
+
+function start() {
+	running ++;
+}
+
+function finish() {	
+	running --;
+	if (running < 1) {
+		process.exit();
+	}
+}
+
+// sort of a pseudo migration record. these indexes are essentially required for this app to run 
+
+function getIndexes() {
+	console.log("getting indexes...");
+	start();
+	items.indexes(function(err, i) {
+		console.error("items indexing error: ", err);
+		console.log("indexes: ", i);
+		finish();
+	})	
+}
+
+getIndexes();
+
+console.log("indexing items by ancestor_id...");
+start();
+items.index({'ancestor_id': 1}, function(err, res) {
+	console.error("items ancestor_id index error: ", err);	
+	console.log("indexed items by ancestor_id. index res: ", res);
+	getIndexes();
+	finish();
+})

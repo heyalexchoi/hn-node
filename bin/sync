@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+require('dotenv').load();
+require('newrelic');
+
 const Syncer = require('../services/hn_syncer');
 const syncer = new Syncer();
-syncer.syncEverything();
+syncer.syncEverything(function(item, error) {
+	if (item) {
+		console.log("synced item: " + item);
+	}
+	if (error) {
+		console.log("sync error: " + error);
+	}
+});
