@@ -11,6 +11,8 @@ const storiesCollection = db.stories;
 
 function HNHelper() {}
 
+HNHelper.prototype.db = db;
+
 /* 
 Pulls out stories array for type (ie 'topstories'), 
 gets the story item for each id, and asynchronously

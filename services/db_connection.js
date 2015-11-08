@@ -1,7 +1,7 @@
-var monk = require('monk');
-var config = require('config');
-var dbURL = process.env.MONGODB_URL || config.mongodb.url;
-var db = monk(dbURL);
+const monk = require('monk');
+const config = require('config');
+const dbURL = process.env.MONGODB_URL || config.mongodb.url;
+const db = monk(dbURL);
 
 const storiesCollection = db.get('stories');
 const itemsCollection = db.get('items');
