@@ -2,5 +2,5 @@ version: 1
 cron:
 # runs everyday at 11pm
  - name: "clean_db"          # required - unique across all entries in this file
-   url: "/bin/clean_db"              # required - does not need to be unique
+   url: "npm run clean_db"              # required - does not need to be unique
    schedule: "0 23 * * *"    # required - does not need to be unique
