@@ -110,10 +110,10 @@ HNHelper.prototype.getItemWithAllDescendants = function(id, callback) {
 	self.getItem(id)
 	.then(function(resItem) {
 		item = resItem;
-		return itemsCollection.find({ancestor_id: id});	
+		return itemsCollection.find({ancestor_id: id});
 	})
 	.then(function(resDescendants) {
-		return buildTree(item, resDescendants);				
+		return buildTree(item, resDescendants);
 	})
 	.then(function(built) {
 		callback(null, built);
