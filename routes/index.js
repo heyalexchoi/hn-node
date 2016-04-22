@@ -29,7 +29,7 @@ router.get('/items/:id/updated', function(req, res, next) {
 // TO DO: add page limit offset to req, query, and result
 router.get('/:type(*{3,}stories)', function(req, res, next) {
     var type = req.params.type;
-    var limit = req.query.limit && req.query.limit < 50 ? req.query.limit : 25;
+    var limit = req.query.limit || 25;
     var offset = req.query.offset || 0;
 
     helper.getStories(type, offset, limit, function(error, stories) {
