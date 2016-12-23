@@ -17,7 +17,7 @@ DBCleaner.prototype.clean = function(callback) {
 	  	console.log("Connected correctly to server at " + dbURL);
 		
 		var date = new Date();
-		date.setMonth(date.getMonth() - 1);
+		date.setDate((new Date()).getDate() - 7);
 
 	  	db.collection('items').remove({updated: {$lt: date}}, function(err, result) {
 			if (err) {
