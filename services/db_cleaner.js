@@ -17,9 +17,10 @@ DBCleaner.prototype.clean = function(callback) {
 	  	console.log("Connected correctly to server at " + dbURL);
 		
 		var date = new Date();
-		date.setDate((new Date()).getDate() - 7);
-
-	  	db.collection('items').remove({updated: {$lt: date}}, function(err, result) {
+		date.setDate(date.getDate() - 7);
+		
+// convert date to string for query because dates are being saved a strings. using a very old mongo library and honestly don't feel like digging into this too much.
+	  	db.collection('items').remove({updated: {$lt: date.toString()}}, function(err, result) {
 			if (err) {
 				console.error(err);
 			} else {
